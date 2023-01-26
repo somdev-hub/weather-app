@@ -9,65 +9,79 @@ app.use(cors()); //cors is used to allow cross origin requests
 
 const api_key = `${process.env.API_KEY}`; //api key is stored in .env file
 
-const new_cities = [
-  { city: "Mumbai" },
-  { city: "Delhi" },
-  { city: "Bangalore" },
-  { city: "Hyderabad" },
-  { city: "Chennai" },
-  { city: "Kolkata" },
-  { city: "Pune" },
-  { city: "Ahmedabad" },
-  { city: "Surat" },
-  { city: "Jaipur" },
-  { city: "Lucknow" },
-  { city: "Kanpur" },
-  { city: "Nagpur" },
-  { city: "Patna" },
-  { city: "Indore" },
-  { city: "Thane" },
-  { city: "Bhopal" },
-  { city: "Visakhapatnam" },
-  { city: "Vadodara" },
-  { city: "Firozabad" },
-  { city: "Ludhiana" },
-  { city: "Rajkot" },
-  { city: "Agra" },
-  { city: "Siliguri" },
-  { city: "Nashik" },
-  { city: "Faridabad" },
-  { city: "Patiala" },
-  { city: "Meerut" },
-  { city: "Rourkela" },
-  { city: "bhubaneswar" }
-]; //cities in the array
+const cities = [
+  "Mumbai",
+  "Delhi",
+  "Bangalore",
+  "Hyderabad",
+  "Chennai",
+  "Kolkata",
+  "Pune",
+  "Ahmedabad",
+  "Surat",
+  "Jaipur",
+  "Lucknow",
+  "Kanpur",
+  "Nagpur",
+  "Patna",
+  "Indore",
+  "Thane",
+  "Bhopal",
+  "Visakhapatnam",
+  "Vadodara",
+  "Firozabad",
+  "Ludhiana",
+  "Rajkot",
+  "Agra",
+  "Siliguri",
+  "Nashik",
+  "Faridabad",
+  "Patiala",
+  "Meerut",
+  "Rourkela",
+  "Bhubaneswar"
+]; //list of cities
+
+const WeatherData = []; //array to store weather data
+
+let requests = cities.map((city) => {
+  //map function is used to iterate over the array of cities
+  return new Promise((resolve, reject) => {
+    //promise is used to handle asynchronous operations
+    request(
+      {
+        uri: `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${api_key}`, //api call
+        method: "GET" //method is GET
+      },
+      (err, res, body) => {
+        if (err) {
+          reject(err); //rejecting the promise if there is an error
+        }
+        resolve(body); //resolving the promise if there is no error
+      }
+    );
+  });
+});
 
 app.get("/_offset=:offset&_limit=:limit", (req, res) => {
   const offset = parseInt(req.params.offset); //offset and limit are the parameters
   const limit = parseInt(req.params.limit);
   const final = offset + limit;
-  for (let i = offset; i < final; i++) {
-    const url = `http://api.openweathermap.org/data/2.5/weather?q=${new_cities[i].city}&appid=${api_key}`; //api call
-
-    try {
-      request(url, function (err, response, body) {
-        if (err) {
-          console.log("error:", err);
-          res.send("error", err);
-        } else {
-          let weather = JSON.parse(body); //parsing the response
-
-          new_cities[i]["weatherDetails"] = weather; //adding the weather details to the array
+  Promise.all(requests) //promise.all is used to handle multiple promises
+    .then((body) => {
+      body.forEach((res) => {
+        if (res) {
+          WeatherData.push(JSON.parse(res)); //pushing the data into the array
         }
       });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  res.send(new_cities.slice(offset, final)); //sending the sliced array
+      res.send(WeatherData.slice(offset, final)); //sending the data to the client
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
-const port = process.env.PORT || 9000;
+const port = process.env.PORT || 9000; //port is 9000 or process.env.port
 
 app.listen(port, (err) => {
   if (err) {
