@@ -26,7 +26,7 @@ const ActualMap = () => {
   const [loading, setLoading] = useState(false); //whether in loading or not
   const fetchData = async (offset, limit) => {
     setLoading(true); //setting loading to true
-    const url = `http://localhost:9000/_offset=${offset}&_limit=${limit}`;
+    const url = `https://weather-app-backend-higr.onrender.com/_offset=${offset}&_limit=${limit}`;
     try {
       await axios.get(url).then((res) => {
         setWeatherData(res.data);
