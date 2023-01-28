@@ -37,7 +37,9 @@ button {
   border-radius: 50%;
   background: linear-gradient(145deg, #878787, #a1a1a1);
 }
-/* 
-button:disabled{
-  cursor: pointer;
-} */
+
+@media screen and (max-width: 768px) {
+  .pagination {
+    height: auto;
+  }
+}
