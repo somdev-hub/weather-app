@@ -50,7 +50,7 @@ const ActualMap = () => {
         center={{ lat: 20.5937, lng: 78.9629 }}
         zoom={5}
         scrollWheelZoom={false}
-        style={{ height: "93%", width: "100%" }}
+        style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
